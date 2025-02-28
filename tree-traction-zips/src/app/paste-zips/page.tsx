@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { FiMenu, FiX } from "react-icons/fi"; // Import icons
+import { FiMenu, FiX } from "react-icons/fi";
 
 export default function PasteZips() {
     const [zipCodesInput, setZipCodesInput] = useState("");
@@ -20,33 +20,27 @@ export default function PasteZips() {
             const enrichedResults = await Promise.all(
                 zipCodesArray.map(async (zip: string) => {
                     try {
-                        const censusResponse = await axios.get(
-                            `https://api.census.gov/data/2021/acs/acs5?get=NAME,B01003_001E,B25001_001E,B25077_001E,B25003_002E,B19013_001E,B19301_001E&for=zip%20code%20tabulation%20area:${zip}&key=${process.env.NEXT_PUBLIC_CENSUS_API_KEY}`
-                        );
+                        const response = await axios.get(`/api/zipcodes?zip=${zip}`);
 
-                        if (!censusResponse.data || censusResponse.data.length < 2) {
-                            throw new Error(`No data found for ZIP code: ${zip}`);
+                        if (response.status !== 200) {
+                            throw new Error(`Failed to fetch data for ZIP: ${zip}`);
                         }
 
-                        // Extract city and state from NAME field (e.g., "80003, Colorado")
-                        const nameParts = censusResponse.data[1][0].split(", ");
-                        const city = nameParts[0] || "N/A";
-                        const state = nameParts[1] || "N/A";
-
+                        const data = response.data;
                         return {
                             postalCode: zip,
-                            city,
-                            state,
-                            population: parseInt(censusResponse.data[1][1] || "0"),
-                            housingUnits: parseInt(censusResponse.data[1][2] || "0"),
-                            medianHomeValue: parseInt(censusResponse.data[1][3] || "0"),
-                            homeownershipRate: ((parseFloat(censusResponse.data[1][4] || "0") / parseFloat(censusResponse.data[1][2] || "1")) * 100).toFixed(2),
-                            medianHouseholdIncome: parseInt(censusResponse.data[1][5] || "0"),
-                            perCapitaIncome: parseInt(censusResponse.data[1][6] || "0"),
+                            city: data.city || "N/A",
+                            state: data.state || "N/A",
+                            population: data.population || 0,
+                            housingUnits: data.housingUnits || 0,
+                            medianHomeValue: data.medianHomeValue || 0,
+                            homeownershipRate: data.homeownershipRate || 0,
+                            medianHouseholdIncome: data.medianHouseholdIncome || 0,
+                            perCapitaIncome: data.perCapitaIncome || 0,
                         };
                     } catch (error) {
                         console.error(`Error fetching data for ZIP ${zip}:`, error);
-                        return { postalCode: zip, error: "Data not found" };
+                        return { postalCode: zip, city: "N/A", state: "N/A", error: "Data not found" };
                     }
                 })
             );
@@ -113,13 +107,10 @@ export default function PasteZips() {
 
             {/* Main Content */}
             <div className="flex-1 p-8">
-                {/* Hero Section */}
                 <div className="text-center py-12 bg-green-900 text-white rounded-lg shadow-md">
                     <h1 className="text-4xl font-bold">Fetch ZIP Code Data</h1>
-                    <p className="mt-2 text-gray-200">Paste ZIP codes below to retrieve census information</p>
                 </div>
 
-                {/* Input Section */}
                 <div className="flex flex-col items-center mt-6">
                     <textarea
                         value={zipCodesInput}
@@ -128,10 +119,7 @@ export default function PasteZips() {
                         placeholder="Paste ZIP codes separated by spaces, commas, or line breaks"
                         rows={3}
                     />
-                    <button
-                        onClick={fetchZipData}
-                        className="mt-4 bg-yellow-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-yellow-600 transition"
-                    >
+                    <button onClick={fetchZipData} className="mt-4 bg-yellow-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-yellow-600 transition">
                         Fetch Data
                     </button>
                 </div>
@@ -142,9 +130,15 @@ export default function PasteZips() {
                         <table className="min-w-full bg-white shadow-md rounded-lg">
                             <thead className="bg-green-900 text-white">
                                 <tr>
-                                    <th className="border p-3">ZIP Code</th>
-                                    <th className="border p-3">City</th>
-                                    <th className="border p-3">State</th>
+                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("postalCode")}>
+                                        ZIP Code {sortConfig?.key === "postalCode" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+                                    </th>
+                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("city")}>
+                                        City {sortConfig?.key === "city" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+                                    </th>
+                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("state")}>
+                                        State {sortConfig?.key === "state" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+                                    </th>
                                     <th className="border p-3 cursor-pointer" onClick={() => sortTable("population")}>
                                         Population {sortConfig?.key === "population" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
                                     </th>
@@ -152,16 +146,16 @@ export default function PasteZips() {
                                         Housing Units {sortConfig?.key === "housingUnits" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
                                     </th>
                                     <th className="border p-3 cursor-pointer" onClick={() => sortTable("medianHomeValue")}>
-                                        Median Home Value ($)
+                                        Median Home Value ($) {sortConfig?.key === "medianHomeValue" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
                                     </th>
                                     <th className="border p-3 cursor-pointer" onClick={() => sortTable("homeownershipRate")}>
-                                        Homeownership Rate (%)
+                                        Homeownership Rate (%) {sortConfig?.key === "homeownershipRate" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
                                     </th>
                                     <th className="border p-3 cursor-pointer" onClick={() => sortTable("medianHouseholdIncome")}>
-                                        Median Household Income ($)
+                                        Median Household Income ($) {sortConfig?.key === "medianHouseholdIncome" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
                                     </th>
                                     <th className="border p-3 cursor-pointer" onClick={() => sortTable("perCapitaIncome")}>
-                                        Per Capita Income ($)
+                                        Per Capita Income ($) {sortConfig?.key === "perCapitaIncome" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
                                     </th>
                                 </tr>
                             </thead>
