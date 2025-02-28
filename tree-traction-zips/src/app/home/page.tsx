@@ -1,10 +1,33 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FiMenu, FiX } from "react-icons/fi";
 
 export default function Home() {
     const [navOpen, setNavOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const authStatus = localStorage.getItem("isAuthenticated");
+        if (!authStatus) {
+            router.push("/password"); // Redirect to password page if not authenticated
+        } else {
+            setIsAuthenticated(true);
+        }
+    }, [router]);
+
+    const handleLogout = () => {
+        localStorage.removeItem("isAuthenticated"); // Remove authentication
+        setIsAuthenticated(false);
+        router.push("/password"); // Redirect back to the password page
+    };
+
+    if (!isAuthenticated) {
+        return <h1>Redirecting to password page...</h1>;
+    }
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -30,6 +53,11 @@ export default function Home() {
                         </li>
                     </ul>
                 </nav>
+                <div className="p-4">
+                    <button onClick={handleLogout} className="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition">
+                        Logout
+                    </button>
+                </div>
             </div>
 
             {/* Main Content */}

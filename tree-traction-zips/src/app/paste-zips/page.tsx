@@ -1,10 +1,10 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
 import { FiMenu, FiX } from "react-icons/fi";
 
 export default function PasteZips() {
@@ -12,6 +12,17 @@ export default function PasteZips() {
     const [results, setResults] = useState<any[]>([]);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
     const [navOpen, setNavOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const authStatus = localStorage.getItem("isAuthenticated");
+        if (!authStatus) {
+            router.push("/password"); // Redirect to password page if not authenticated
+        } else {
+            setIsAuthenticated(true);
+        }
+    }, [router]);
 
     const fetchZipData = async () => {
         try {
@@ -53,20 +64,23 @@ export default function PasteZips() {
     };
 
     const sortTable = (key: string) => {
-        let direction: "asc" | "desc" = "asc";
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
-            direction = "desc";
-        }
-
-        const sortedData = [...results].sort((a, b) => {
-            if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-            if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
-            return 0;
+        setSortConfig((prevSortConfig) => {
+            const direction = prevSortConfig?.key === key && prevSortConfig.direction === "asc" ? "desc" : "asc";
+            return { key, direction };
         });
 
-        setResults(sortedData);
-        setSortConfig({ key, direction });
+        setResults((prevResults) =>
+            [...prevResults].sort((a, b) => {
+                if (a[key] < b[key]) return sortConfig?.direction === "asc" ? -1 : 1;
+                if (a[key] > b[key]) return sortConfig?.direction === "asc" ? 1 : -1;
+                return 0;
+            })
+        );
     };
+
+    if (!isAuthenticated) {
+        return <h1>Redirecting to password page...</h1>;
+    }
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
@@ -130,33 +144,15 @@ export default function PasteZips() {
                         <table className="min-w-full bg-white shadow-md rounded-lg">
                             <thead className="bg-green-900 text-white">
                                 <tr>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("postalCode")}>
-                                        ZIP Code {sortConfig?.key === "postalCode" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("city")}>
-                                        City {sortConfig?.key === "city" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("state")}>
-                                        State {sortConfig?.key === "state" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("population")}>
-                                        Population {sortConfig?.key === "population" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("housingUnits")}>
-                                        Housing Units {sortConfig?.key === "housingUnits" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("medianHomeValue")}>
-                                        Median Home Value ($) {sortConfig?.key === "medianHomeValue" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("homeownershipRate")}>
-                                        Homeownership Rate (%) {sortConfig?.key === "homeownershipRate" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("medianHouseholdIncome")}>
-                                        Median Household Income ($) {sortConfig?.key === "medianHouseholdIncome" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
-                                    <th className="border p-3 cursor-pointer" onClick={() => sortTable("perCapitaIncome")}>
-                                        Per Capita Income ($) {sortConfig?.key === "perCapitaIncome" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
-                                    </th>
+                                    {["postalCode", "city", "state", "population", "housingUnits", "medianHomeValue", "homeownershipRate", "medianHouseholdIncome", "perCapitaIncome"].map((key) => (
+                                        <th
+                                            key={key}
+                                            className="border p-3 cursor-pointer"
+                                            onClick={() => sortTable(key)}
+                                        >
+                                            {key.replace(/([A-Z])/g, " $1")} {sortConfig?.key === key ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
