@@ -8,12 +8,10 @@ export default function PasswordPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const appPassword = process.env.APP_PASSWORD;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const storedPassword = appPassword; // Retrieve from .env
+    const storedPassword = process.env.NEXT_PUBLIC_APP_PASSWORD; // Retrieve from .env
     if (password === storedPassword) {
       localStorage.setItem("isAuthenticated", "true"); // Store authentication
       router.push("/home"); // Redirect to home page
