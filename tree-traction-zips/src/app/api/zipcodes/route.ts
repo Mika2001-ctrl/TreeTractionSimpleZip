@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
         const city = zipData.city || "N/A";
         const state = zipData.state || "N/A";
 
+
         return NextResponse.json({
             postalCode: zip,
             city,

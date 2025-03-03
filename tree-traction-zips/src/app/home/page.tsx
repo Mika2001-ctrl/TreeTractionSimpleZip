@@ -43,13 +43,18 @@ export default function Home() {
                     <ul className="space-y-4">
                         <li>
                             <a href="https://www.unitedstateszipcodes.org/zip-code-radius-map.php" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <span className="ml-2">Zip Code Radius Map</span>
+                                <span className="ml-2">1. Radius Map</span>
                             </a>
                         </li>
                         <li>
                             <Link href="/paste-zips" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <span className="ml-2">Zip Data Fetch</span>
+                                <span className="ml-2">2. Data Analysis</span>
                             </Link>
+                        </li>
+                        <li>
+                            <a href="https://airtable.com/appwEwVlryjLI3uYi/pagJK79hMTa2snJ2T?myKfS=allRecords" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                                <span className="ml-2">3. Reserved Zip Codes</span>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -77,10 +82,11 @@ export default function Home() {
 
                     {/* Info Section */}
                     <div className="mt-8 p-6 bg-white shadow-md rounded-lg">
-                        <h2 className="text-2xl font-semibold text-gray-700">What can you do?</h2>
+                        <h2 className="text-2xl font-semibold text-gray-700">Terms of Use:</h2>
                         <ul className="list-disc ml-6 mt-3 text-gray-600 space-y-2">
-                            <li>Analyze ZIP code distances using the <b>Zip Code Radius Map</b>.</li>
-                            <li>Fetch detailed demographic data (population, housing, income, etc.).</li>
+                            <li>Extract zip codes in a specified radius by selecting the tab in the navigation pane labeled: <div></div><b>Zip Code Radius Map</b>.</li>
+                            <li>Paste the zip code/s extracted above (or any zip code/s) and fetch detailed demographic data by selecting the tab in the navigation pane labeled: <div></div><b>Zip Data Fetch</b></li>
+                            <li>Check if selected zip codes are reserved by selecting the tab in the navigation pane labeled: <div></div><b>Check Reserved Zip Codes</b></li>
                         </ul>
                     </div>
                 </main>
