@@ -22,3 +22,32 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@media print {
+  body {
+    color: black !important;
+    background: white !important;
+  }
+
+  .bg-green-900 {
+    background: darkgreen !important;
+    color: white !important;
+  }
+
+  .bg-yellow-300 {
+    background-color: #FFD700 !important;
+    /* Ensures yellow stays visible */
+    color: black !important;
+  }
+
+  .shadow-md,
+  .rounded-lg {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

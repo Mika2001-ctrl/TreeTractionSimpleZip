@@ -2,13 +2,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { FiMenu, FiX } from "react-icons/fi";
+import { ClipboardIcon, Globe } from "lucide-react"; // Import icons
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
+
+
 
 export default function PasteZips() {
+    const [highlightedRows, setHighlightedRows] = useState<number[]>([]);
     const [zipCodesInput, setZipCodesInput] = useState("");
     const [results, setResults] = useState<any[]>([]);
     const [, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
@@ -112,6 +123,8 @@ export default function PasteZips() {
         return <h1>Redirecting to password page...</h1>;
     }
 
+
+
     return (
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar Navigation */}
@@ -153,7 +166,7 @@ export default function PasteZips() {
                     <button onClick={() => setNavOpen(!navOpen)} className="text-white">
                         <FiMenu size={24} />
                     </button>
-                    <h1 className="text-2xl font-bold">Tree Traction Dashboard</h1>
+                    <h1 className="text-2xl font-bold">Tree Traction Zip Analysis</h1>
                 </nav>
 
                 {/* Stats Section */}
@@ -163,15 +176,51 @@ export default function PasteZips() {
                         <p className="text-3xl text-green-700 font-semibold">{zipWithHighestIncome.postalCode}</p>
                     </div>
                     <div className="bg-white shadow-md p-6 rounded-lg">
-                        <h2 className="text-xl font-bold">Highest Population</h2>
-                        <p className="text-3xl text-green-700 font-semibold">{zipWithHighestPopulation.postalCode}</p>
-                    </div>
-                    <div className="bg-white shadow-md p-6 rounded-lg">
                         <h2 className="text-xl font-bold">Highest Homeownership Rate</h2>
                         <p className="text-3xl text-green-700 font-semibold">
                             {zipWithHighestHomeownership.postalCode}
                         </p>
                     </div>
+                    <div className="bg-white shadow-md p-6 rounded-lg">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold">Highlighted ZIPs</h2>
+                            {/* Copy Button */}
+                            {highlightedRows.length > 0 && (
+                                <button
+                                    onClick={() => {
+                                        const zipList = highlightedRows.map((index) => results[index].postalCode).join("\n"); // New line separator
+                                        navigator.clipboard.writeText(zipList);
+                                        toast.success("Highlighted ZIPs copied!", {
+                                            position: "top-right",
+                                            autoClose: 1000,
+                                            hideProgressBar: true,
+                                            closeOnClick: true,
+                                            pauseOnHover: false,
+                                            draggable: false,
+                                            theme: "light",
+                                        });
+                                    }}
+                                    className="p-2 rounded-full hover:bg-gray-200 transition"
+                                    title="Copy Highlighted ZIPs"
+                                >
+                                    <ClipboardIcon className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+                                </button>
+                            )}
+                        </div>
+
+                        <ul className="text-green-700 font-semibold text-lg">
+                            {highlightedRows.length > 0 ? (
+                                highlightedRows.map((index) => (
+                                    <li key={index}>{results[index].postalCode}</li>
+                                ))
+                            ) : (
+                                <li className="text-gray-500">No ZIPs selected</li>
+                            )}
+                        </ul>
+                    </div>
+
+
+
                 </div>
 
                 {/* Input Area */}
@@ -179,7 +228,7 @@ export default function PasteZips() {
                     <h1 className="text-4xl font-bold">Fetch ZIP Code Data</h1>
                     <h6 className="text-2xl font-bold">Click on a Zip code to view it on Google Maps!</h6>
                 </div>
-
+                <div></div>
                 <div className="flex flex-col items-center mt-6">
                     <textarea
                         value={zipCodesInput}
@@ -214,47 +263,78 @@ export default function PasteZips() {
 
                                 </tr>
                             </thead>
+
                             <tbody className="text-black">
                                 {results.map((result, index) => (
-                                    <tr key={index} className="text-center">
-                                        <td className="border p-2">
-                                            {result.city && result.state ? (
-                                                <a
-                                                    href={`https://www.google.com/maps/place/${encodeURIComponent(result.city)},+${encodeURIComponent(result.state)}+${result.postalCode},+USA`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-green-700 hover:text-green-900"
-                                                >
-                                                    {result.postalCode}
-                                                </a>
-                                            ) : (
-                                                result.postalCode
-                                            )}
-                                        </td>
-                                        <td className="border p-2">{result.city || "N/A"}</td>
-                                        <td className="border p-2">{result.state || "N/A"}</td>
-                                        <td className="border p-2">
-                                            {result.population ? result.population.toLocaleString() : "N/A"}
-                                        </td>
-                                        <td className="border p-2">
-                                            {result.housingUnits ? result.housingUnits.toLocaleString() : "N/A"}
-                                        </td>
-                                        <td className="border p-2">
-                                            {result.medianHomeValue ? `$${result.medianHomeValue.toLocaleString()}` : "N/A"}
-                                        </td>
-                                        <td className="border p-2">
-                                            {result.homeownershipRate ? `${result.homeownershipRate.toFixed(2)}%` : "N/A"}
+                                    <tr
+                                        key={index}
+                                        className={`text-center cursor-pointer ${highlightedRows.includes(index) ? "bg-yellow-300" : "bg-white"
+                                            }`}
+                                        onClick={() => {
+                                            setHighlightedRows((prev) =>
+                                                prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+                                            );
+                                        }} // ✅ Clicking toggles the highlight
+                                    >
+                                        <td className="border p-2 flex items-center space-x-2">
+                                            {/* USPS EDDM Tool Link */}
+                                            <a
+                                                href="https://eddm.usps.com/eddm/select-routes.htm"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-green-700 hover:text-green-900 font-medium"
+                                                onClick={(e) => e.stopPropagation()} // Prevent row highlight when clicking this
+                                            >
+                                                {result.postalCode}
+                                            </a>
+
+                                            {/* Copy Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent row highlight when clicking the copy button
+                                                    navigator.clipboard.writeText(result.postalCode);
+                                                    toast.success(`ZIP Code ${result.postalCode} copied!`, {
+                                                        position: "top-right",
+                                                        autoClose: 1000,
+                                                        hideProgressBar: true,
+                                                        closeOnClick: true,
+                                                        pauseOnHover: false,
+                                                        draggable: false,
+                                                        theme: "light",
+                                                    });
+                                                }}
+                                                className="p-1 rounded-full hover:bg-gray-200 transition"
+                                                title="Copy ZIP Code"
+                                            >
+                                                <ClipboardIcon className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+                                            </button>
+
+                                            {/* Google Maps Link with Globe Icon */}
+                                            <a
+                                                href={`https://www.google.com/maps/place/${encodeURIComponent(result.city)},+${encodeURIComponent(result.state)}+${result.postalCode},+USA`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="p-1 rounded-full hover:bg-gray-200 transition"
+                                                title="View in Google Maps"
+                                                onClick={(e) => e.stopPropagation()} // Prevent row highlight when clicking this
+                                            >
+                                                <Globe className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+                                            </a>
                                         </td>
 
-                                        <td className="border p-2">
-                                            {result.medianHouseholdIncome ? `$${result.medianHouseholdIncome.toLocaleString()}` : "N/A"}
-                                        </td>
-                                        <td className="border p-2">
-                                            {result.perCapitaIncome ? `$${result.perCapitaIncome.toLocaleString()}` : "N/A"}
-                                        </td>
+                                        {/* Other Table Data */}
+                                        <td className="border p-2">{result.city || "N/A"}</td>
+                                        <td className="border p-2">{result.state || "N/A"}</td>
+                                        <td className="border p-2">{result.population?.toLocaleString() || "N/A"}</td>
+                                        <td className="border p-2">{result.housingUnits?.toLocaleString() || "N/A"}</td>
+                                        <td className="border p-2">{result.medianHomeValue ? `$${result.medianHomeValue.toLocaleString()}` : "N/A"}</td>
+                                        <td className="border p-2">{result.homeownershipRate ? `${result.homeownershipRate.toFixed(2)}%` : "N/A"}</td>
+                                        <td className="border p-2">{result.medianHouseholdIncome ? `$${result.medianHouseholdIncome.toLocaleString()}` : "N/A"}</td>
+                                        <td className="border p-2">{result.perCapitaIncome ? `$${result.perCapitaIncome.toLocaleString()}` : "N/A"}</td>
                                     </tr>
                                 ))}
                             </tbody>
+
                         </table>
                     </div>
                 )}
@@ -262,4 +342,5 @@ export default function PasteZips() {
             </div>
         </div>
     );
+
 }
