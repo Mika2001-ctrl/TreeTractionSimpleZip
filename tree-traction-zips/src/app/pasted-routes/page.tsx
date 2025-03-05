@@ -17,21 +17,62 @@ export default function PastedRoutes() {
     const [navOpen, setNavOpen] = useState(true);
     const router = useRouter();
 
+    // Function to format income values (rounded to whole numbers, no decimals)
+    // Function to format income values (rounded to whole numbers, no decimals)
+    const formatIncome = (income: string) => {
+        if (!income || income === "—") return ""; // Handle missing values
+
+        // Remove non-numeric characters except "." (for decimal)
+        let num = parseFloat(income.replace(/[^0-9.]/g, ""));
+
+        if (isNaN(num)) return ""; // If parsing fails, return empty string
+
+        // Convert to thousands if income is already in K format (e.g., "30.07k")
+        if (income.toLowerCase().includes("k")) {
+            num *= 1000; // Convert back to raw number
+        }
+
+        return `${Math.round(num / 1000)}K`; // Round and format
+    };
+
+    // Function to format size values (ensures two decimal places)
+    // Function to format size values (ensures two decimal places when needed)
+    // Function to format size values (forces two decimal places)
+    // Function to format size values (multiplies by 100 and forces two decimal places)
+    // Function to format size values (multiplies by 100 and forces two decimal places)
+    const formatSize = (size: string) => {
+        const num = parseFloat(size.replace(/[^0-9.]/g, ""));
+        return isNaN(num) || size === "—" ? "" : (num * 100).toFixed(2); // Multiply by 100
+    };
+
+
+
+
+
+
+    // Function to format age percentage values
+    const formatAgePercent = (percent: string) => {
+        const num = parseFloat(percent.replace(/[^0-9.]/g, "")) / 100;
+        return isNaN(num) ? "" : num.toFixed(3); // Keep three decimal places
+    };
+
+
     const parseRoutes = () => {
         const lines = routesInput.split("\n").map(line => line.trim()).filter(line => line);
         const formatted = [];
 
         for (let i = 0; i < lines.length; i += 8) {
             if (lines.length - i < 8) break; // Ensure enough data for a full row
+
             formatted.push({
                 fullRouteName: lines[i],
-                residential: lines[i + 1],
-                business: lines[i + 2],
-                totalMailpieces: lines[i + 3],
-                agePercent: lines[i + 4],
-                size: lines[i + 5],
-                income: lines[i + 6],
-                cost: lines[i + 7],
+                residential: lines[i + 1] === "—" ? "" : lines[i + 1],
+                business: lines[i + 2] === "—" ? "" : lines[i + 2],
+                totalMailpieces: lines[i + 3] === "—" ? "" : lines[i + 3],
+                agePercent: formatAgePercent(lines[i + 4]), // Convert to decimal
+                size: formatSize(lines[i + 5]),
+                income: formatIncome(lines[i + 6]), // Convert to rounded K format with no decimals
+                cost: lines[i + 7] === "—" ? "" : lines[i + 7],
                 clientName: clientName || "N/A",
             });
         }
@@ -40,7 +81,10 @@ export default function PastedRoutes() {
     };
 
     const copyRoutesToClipboard = () => {
-        const text = formattedRoutes.map(route => `${route.fullRouteName}\t${route.residential}\t${route.business}\t${route.totalMailpieces}\t${route.agePercent}\t${route.size}\t${route.income}\t${route.cost}\t${route.clientName}`).join("\n");
+        const text = formattedRoutes.map(route =>
+            `${route.fullRouteName}\t${route.residential}\t${route.business}\t${route.totalMailpieces}\t${route.agePercent}\t${route.size}\t${route.income}\t${route.cost}\t${route.clientName}`
+        ).join("\n");
+
         navigator.clipboard.writeText(text);
         toast.success("Formatted routes copied to clipboard!", { autoClose: 1000 });
     };
