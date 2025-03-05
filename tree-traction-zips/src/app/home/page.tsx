@@ -56,6 +56,11 @@ export default function Home() {
                                 <span className="ml-2">3. Reserved Zip Codes</span>
                             </a>
                         </li>
+                        <li>
+                            <Link href="/pasted-routes" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                                <span className="ml-2">4. Paste eddm Routes</span>
+                            </Link>
+                        </li>
                     </ul>
                 </nav>
                 <div className="p-4">
