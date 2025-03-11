@@ -121,8 +121,8 @@ export default function PastedRoutes() {
                         </a>
                     </li>
                     <li>
-                        <Link href="/pasted-routes" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">4. Paste eddm Routes</span>
+                        <Link href="/house-age" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">4. View ZIP home age </span>
                         </Link>
                     </li>
                 </ul>

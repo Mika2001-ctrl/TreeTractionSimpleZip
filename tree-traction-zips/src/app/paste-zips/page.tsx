@@ -138,7 +138,7 @@ export default function PasteZips() {
                 <ul className="space-y-4">
                     <li>
                         <Link href="/home" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">Terms Of Use</span>
+                            <span className="ml-2">Home</span>
                         </Link>
                     </li>
                     <li>
@@ -147,14 +147,19 @@ export default function PasteZips() {
                         </a>
                     </li>
                     <li>
-                        <Link href="/paste-zips" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">2. Data Analysis</span>
+                        <a href="https://airtable.com/appwEwVlryjLI3uYi/pagJK79hMTa2snJ2T?myKfS=allRecords" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">2. Reserved Zip Codes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <Link href="/house-age" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">3. View ZIP home age </span>
                         </Link>
                     </li>
                     <li>
-                        <a href="https://airtable.com/appwEwVlryjLI3uYi/pagJK79hMTa2snJ2T?myKfS=allRecords" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">3. Reserved Zip Codes</span>
-                        </a>
+                        <Link href="/pasted-routes" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">4. Paste eddm Routes</span>
+                        </Link>
                     </li>
                 </ul>
 
@@ -226,7 +231,7 @@ export default function PasteZips() {
                 {/* Input Area */}
                 <div className="text-center py-12 bg-green-900 text-white rounded-lg shadow-md mt-8">
                     <h1 className="text-4xl font-bold">Fetch ZIP Code Data</h1>
-                    <h6 className="text-2xl font-bold">Click on a Zip code to view it on Google Maps!</h6>
+                    <h6 className="text-2xl font-bold">Click on the globe next to a zip code to view it on Google Maps!</h6>
                 </div>
                 <div></div>
                 <div className="flex flex-col items-center mt-6">

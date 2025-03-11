@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
     try {
         // Fetch Census data
         const censusResponse = await axios.get(
-            `https://api.census.gov/data/2021/acs/acs5?get=NAME,B01003_001E,B25001_001E,B25077_001E,B25003_002E,B19013_001E,B19301_001E&for=zip%20code%20tabulation%20area:${zip}&key=${process.env.CENSUS_API_KEY}`
+            `https://api.census.gov/data/2023/acs/acs5?get=NAME,B01003_001E,B25001_001E,B25077_001E,B25003_002E,B19013_001E,B19301_001E&for=zip%20code%20tabulation%20area:${zip}&key=${process.env.CENSUS_API_KEY}`
+
         );
 
         const censusData = censusResponse.data[1] || [];
