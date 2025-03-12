@@ -19,13 +19,11 @@ export async function GET(req: NextRequest) {
         const censusData = censusResponse.data[1] || [];
 
         // Fetch Zipcodestack data
-        const zipResponse = await axios.get(`https://api.zipcodestack.com/v1/search?codes=${zip}&country=us`, {
-            headers: { apikey: process.env.ZIPCODESTACK_API_KEY },
-        });
+        const zipResponse = await axios.get(`https://api.zippopotam.us/us/${zip}`);
 
-        const zipData = zipResponse.data?.results?.[zip]?.[0] || {};
-        const city = zipData.city || "N/A";
-        const state = zipData.state || "N/A";
+        const zipData = zipResponse.data || {};
+        const city = zipData.places?.[0]?.["place name"] || "N/A";
+        const state = zipData.places?.[0]?.["state abbreviation"] || "N/A";
 
 
         return NextResponse.json({
