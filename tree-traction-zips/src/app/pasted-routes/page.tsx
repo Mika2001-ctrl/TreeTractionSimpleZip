@@ -17,63 +17,47 @@ export default function PastedRoutes() {
     const [navOpen, setNavOpen] = useState(true);
     const router = useRouter();
 
-    // Function to format income values (rounded to whole numbers, no decimals)
-    // Function to format income values (rounded to whole numbers, no decimals)
     const formatIncome = (income: string) => {
-        if (!income || income === "—") return ""; // Handle missing values
-
-        // Remove non-numeric characters except "." (for decimal)
+        if (!income || income === "—") return "";
         let num = parseFloat(income.replace(/[^0-9.]/g, ""));
-
-        if (isNaN(num)) return ""; // If parsing fails, return empty string
-
-        // Convert to thousands if income is already in K format (e.g., "30.07k")
-        if (income.toLowerCase().includes("k")) {
-            num *= 1000; // Convert back to raw number
-        }
-
-        return `${Math.round(num / 1000)}K`; // Round and format
+        if (isNaN(num)) return "";
+        if (income.toLowerCase().includes("k")) num *= 1000; // Convert K format back to full number
+        return num.toLocaleString(); // Format as 70,000 instead of 70K
     };
 
-    // Function to format size values (ensures two decimal places)
-    // Function to format size values (ensures two decimal places when needed)
-    // Function to format size values (forces two decimal places)
-    // Function to format size values (multiplies by 100 and forces two decimal places)
-    // Function to format size values (multiplies by 100 and forces two decimal places)
+    const extractZip = (fullRouteName: string) => {
+        const match = fullRouteName.match(/^(\d{5})/); // Extract first 5 digits
+        return match ? match[1] : "Unknown"; // Default to "Unknown" if no ZIP found
+    };
+
     const formatSize = (size: string) => {
         const num = parseFloat(size.replace(/[^0-9.]/g, ""));
-        return isNaN(num) || size === "—" ? "" : (num * 100).toFixed(2); // Multiply by 100
+        return isNaN(num) || size === "—" ? "" : num.toFixed(2); // Ensure two decimal places
     };
 
-
-
-
-
-
-    // Function to format age percentage values
     const formatAgePercent = (percent: string) => {
         const num = parseFloat(percent.replace(/[^0-9.]/g, "")) / 100;
-        return isNaN(num) ? "" : num.toFixed(3); // Keep three decimal places
+        return isNaN(num) ? "" : num.toFixed(3);
     };
-
 
     const parseRoutes = () => {
         const lines = routesInput.split("\n").map(line => line.trim()).filter(line => line);
         const formatted = [];
 
         for (let i = 0; i < lines.length; i += 8) {
-            if (lines.length - i < 8) break; // Ensure enough data for a full row
+            if (lines.length - i < 8) break;
 
             formatted.push({
                 fullRouteName: lines[i],
                 residential: lines[i + 1] === "—" ? "" : lines[i + 1],
                 business: lines[i + 2] === "—" ? "" : lines[i + 2],
                 totalMailpieces: lines[i + 3] === "—" ? "" : lines[i + 3],
-                agePercent: formatAgePercent(lines[i + 4]), // Convert to decimal
-                size: formatSize(lines[i + 5]),
-                income: formatIncome(lines[i + 6]), // Convert to rounded K format with no decimals
+                agePercent: formatAgePercent(lines[i + 4]),
+                size: formatSize(lines[i + 5]), // Fix Size Formatting
+                income: formatIncome(lines[i + 6]), // Fix Income Formatting
                 cost: lines[i + 7] === "—" ? "" : lines[i + 7],
                 clientName: clientName || "N/A",
+                column: extractZip(lines[i]), // Extract ZIP and store in the new column
             });
         }
 
@@ -82,7 +66,7 @@ export default function PastedRoutes() {
 
     const copyRoutesToClipboard = () => {
         const text = formattedRoutes.map(route =>
-            `${route.fullRouteName}\t${route.residential}\t${route.business}\t${route.totalMailpieces}\t${route.agePercent}\t${route.size}\t${route.income}\t${route.cost}\t${route.clientName}`
+            `${route.fullRouteName}\t${route.residential}\t${route.business}\t${route.totalMailpieces}\t${route.agePercent}\t${route.size}\t${route.income}\t${route.cost}\t${route.clientName}\t${route.column}`
         ).join("\n");
 
         navigator.clipboard.writeText(text);
@@ -91,7 +75,6 @@ export default function PastedRoutes() {
 
     return (
         <div className="flex min-h-screen bg-gray-100">
-            {/* Sidebar Navigation */}
             <div className={`fixed inset-0 bg-green-900 text-white w-64 p-4 transform ${navOpen ? "translate-x-0" : "-translate-x-full"} transition-transform`}>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-semibold">Navigation</h2>
@@ -105,30 +88,9 @@ export default function PastedRoutes() {
                             <span className="ml-2">Home</span>
                         </Link>
                     </li>
-                    <li>
-                        <a href="https://www.unitedstateszipcodes.org/zip-code-radius-map.php" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">1. Radius Map</span>
-                        </a>
-                    </li>
-                    <li>
-                        <Link href="/paste-zips" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">2. Data Analysis</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <a href="https://airtable.com/appwEwVlryjLI3uYi/pagJK79hMTa2snJ2T?myKfS=allRecords" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">3. Reserved Zip Codes</span>
-                        </a>
-                    </li>
-                    <li>
-                        <Link href="/house-age" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">4. View ZIP home age </span>
-                        </Link>
-                    </li>
                 </ul>
             </div>
 
-            {/* Main Content */}
             <div className={`flex-1 p-8 ${navOpen ? "ml-64" : "ml-0"} transition-all`}>
                 <nav className="bg-green-900 text-white p-4 flex justify-between items-center shadow-md">
                     <button onClick={() => setNavOpen(!navOpen)} className="text-white">
@@ -137,7 +99,6 @@ export default function PastedRoutes() {
                     <h1 className="text-2xl font-bold">Route Data Formatter</h1>
                 </nav>
 
-                {/* Input Section */}
                 <div className="bg-white p-6 rounded-lg shadow-md mt-6">
                     <h2 className="text-xl font-bold mb-4">Paste Route Data</h2>
                     <input
@@ -159,7 +120,6 @@ export default function PastedRoutes() {
                     </button>
                 </div>
 
-                {/* Results Table */}
                 {formattedRoutes.length > 0 && (
                     <div className="mt-8 overflow-x-auto">
                         <div className="flex justify-between items-center mb-4">
@@ -180,6 +140,7 @@ export default function PastedRoutes() {
                                     <th className="border p-3">Income</th>
                                     <th className="border p-3">Cost</th>
                                     <th className="border p-3">Client Name</th>
+                                    <th className="border p-3">Column</th> {/* New column header */}
                                 </tr>
                             </thead>
                             <tbody>
@@ -194,6 +155,7 @@ export default function PastedRoutes() {
                                         <td className="border p-2">{route.income}</td>
                                         <td className="border p-2">{route.cost}</td>
                                         <td className="border p-2">{route.clientName}</td>
+                                        <td className="border p-2">{route.column}</td> {/* New column data */}
                                     </tr>
                                 ))}
                             </tbody>
