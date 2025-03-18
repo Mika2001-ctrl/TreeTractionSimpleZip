@@ -140,7 +140,7 @@ export default function PastedRoutes() {
                                     <th className="border p-3">Income</th>
                                     <th className="border p-3">Cost</th>
                                     <th className="border p-3">Client Name</th>
-                                    <th className="border p-3">Column</th> {/* New column header */}
+                                    <th className="border p-3">Zip Code</th> {/* New column header */}
                                 </tr>
                             </thead>
                             <tbody>
