@@ -73,6 +73,11 @@ export default function Home() {
                         <h3 className="text-xl font-semibold text-green-900">🏠 House Age Analysis</h3>
                         <p className="mt-2 text-gray-600">View housing age distribution by ZIP code.</p>
                     </Link>
+                    {/* Info */}
+                    <Link href="/info" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
+                        <h3 className="text-xl font-semibold text-green-900">🌳Tree density Visualisation</h3>
+                        <p className="mt-2 text-gray-600">View tree density on a map per zip code.</p>
+                    </Link>
 
                     {/* Logout Block - Now Light Green */}
                     <div onClick={handleLogout} className="cursor-pointer bg-green-300 text-green-900 p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-1 hover:bg-green-400 text-center">

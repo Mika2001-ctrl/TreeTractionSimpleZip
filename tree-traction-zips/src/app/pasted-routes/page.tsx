@@ -88,6 +88,31 @@ export default function PastedRoutes() {
                             <span className="ml-2">Home</span>
                         </Link>
                     </li>
+                    <li>
+                        <a href="https://www.unitedstateszipcodes.org/zip-code-radius-map.php" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">1. Radius Map</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://airtable.com/appwEwVlryjLI3uYi/pagJK79hMTa2snJ2T?myKfS=allRecords" target="_blank" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">2. Reserved Zip Codes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <Link href="/house-age" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">3. View ZIP home age </span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/paste-zips" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">4.Analyse Zip Stats</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/info" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">5. See tree density</span>
+                        </Link>
+                    </li>
                 </ul>
             </div>
 

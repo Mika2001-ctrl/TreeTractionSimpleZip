@@ -121,7 +121,7 @@ export default function HouseAge() {
                     </li>
                     <li>
                         <Link href="/paste-zips" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">2. Data Analysis</span>
+                            <span className="ml-2">2. Analyse Zip Stats</span>
                         </Link>
                     </li>
                     <li>
@@ -132,6 +132,11 @@ export default function HouseAge() {
                     <li>
                         <Link href="/pasted-routes" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
                             <span className="ml-2">4. Paste eddm Routes</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/info" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">5. See tree density</span>
                         </Link>
                     </li>
                 </ul>

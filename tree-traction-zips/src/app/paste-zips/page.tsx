@@ -157,8 +157,13 @@ export default function PasteZips() {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/pasted-routes" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <span className="ml-2">4. Paste eddm Routes</span>
+                        <Link href="/paste-zips" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">4. Analyse Zip Stats</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/info" className="flex items-center p-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <span className="ml-2">5. See tree density</span>
                         </Link>
                     </li>
                 </ul>
