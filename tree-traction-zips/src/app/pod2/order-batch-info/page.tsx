@@ -7,13 +7,13 @@ interface OrderRow {
     route: string;
     description: string;
     mailers: string;
-    shippingCost?: string;
     pdf: string;
 }
 
 interface Order {
     label: string;
     zip: string;
+    shippingCost?: string; // ✅ moved here
     rows: OrderRow[];
 }
 
@@ -24,7 +24,8 @@ export default function OrderBatchPage() {
     const [orders, setOrders] = useState<Order[]>([{
         label: 'Order 1',
         zip: '',
-        rows: [{ route: '', description: '', mailers: '', shippingCost: '', pdf: '' }],
+        shippingCost: '',
+        rows: [{ route: '', description: '', mailers: '', pdf: '' }],
     }]);
 
     const handleNumOrdersChange = (value: number) => {
@@ -33,7 +34,8 @@ export default function OrderBatchPage() {
             newOrders.push({
                 label: orders[i]?.label || `Order ${i + 1}`,
                 zip: orders[i]?.zip || '',
-                rows: orders[i]?.rows || [{ route: '', description: '', mailers: '', shippingCost: '', pdf: '' }],
+                shippingCost: orders[i]?.shippingCost || '',
+                rows: orders[i]?.rows || [{ route: '', description: '', mailers: '', pdf: '' }],
             });
         }
         setOrders(newOrders);
@@ -59,7 +61,7 @@ export default function OrderBatchPage() {
 
     const addRow = (orderIndex: number) => {
         const updated = [...orders];
-        updated[orderIndex].rows.push({ route: '', description: '', mailers: '', shippingCost: '', pdf: '' });
+        updated[orderIndex].rows.push({ route: '', description: '', mailers: '', pdf: '' });
         setOrders(updated);
     };
 
@@ -88,7 +90,37 @@ export default function OrderBatchPage() {
                     <option value="Standard">Standard</option>
                     <option value="Express">Express</option>
                 </select>
-                <button className="bg-green-600 text-white px-4 py-2 rounded">Save Order Batch</button>
+                <button
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                    onClick={async () => {
+                        const batchData = {
+                            batchDate,
+                            numOrders,
+                            shippingType,
+                            orders,
+                        };
+
+                        try {
+                            const res = await fetch('/api/order-batch', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(batchData),
+                            });
+
+                            const result = await res.json();
+                            if (result.success) {
+                                alert('✅ Order batch saved successfully!');
+                            } else {
+                                alert('❌ Failed to save: ' + result.error);
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('⚠️ Error saving batch.');
+                        }
+                    }}
+                >
+                    Save Order Batch
+                </button>
             </div>
 
             {orders.map((order, orderIndex) => (
@@ -106,6 +138,15 @@ export default function OrderBatchPage() {
                         value={order.zip}
                         onChange={(e) => updateOrderField(orderIndex, 'zip', e.target.value)}
                     />
+                    {shippingType === 'Express' && (
+                        <input
+                            type="text"
+                            placeholder="Shipping Cost"
+                            className="w-full border mb-2 px-2 py-1"
+                            value={order.shippingCost}
+                            onChange={(e) => updateOrderField(orderIndex, 'shippingCost', e.target.value)}
+                        />
+                    )}
 
                     <table className="w-full text-left border mt-2">
                         <thead className="bg-green-900 text-white">
@@ -113,7 +154,6 @@ export default function OrderBatchPage() {
                                 <th className="p-2">Route</th>
                                 <th className="p-2">Description</th>
                                 <th className="p-2">Mailers</th>
-                                {shippingType === 'Express' && <th className="p-2">Shipping Cost</th>}
                                 <th className="p-2">PDF Used</th>
                             </tr>
                         </thead>
@@ -141,15 +181,6 @@ export default function OrderBatchPage() {
                                             onChange={(e) => updateRowField(orderIndex, rowIndex, 'mailers', e.target.value)}
                                         />
                                     </td>
-                                    {shippingType === 'Express' && (
-                                        <td className="border p-2">
-                                            <input
-                                                className="w-full border px-2 py-1"
-                                                value={row.shippingCost}
-                                                onChange={(e) => updateRowField(orderIndex, rowIndex, 'shippingCost', e.target.value)}
-                                            />
-                                        </td>
-                                    )}
                                     <td className="border p-2">
                                         <input
                                             className="w-full border px-2 py-1"
